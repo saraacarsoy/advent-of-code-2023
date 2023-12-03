@@ -26,6 +26,7 @@ function checkNumber(arr) {
 
     for (let i = 0; i < arr.length; i++) {
         let numbers = "";
+        let conditionArr = [];
 
         for (let j = 0; j < arr[i].length; j++) {
             const currentValue = arr[i][j];
