@@ -37,6 +37,27 @@ function checkCurrentMap(seedId, map) {
     return newSeedVal;
 }
 
+function generateRange(start, amount) {
+    const range = [];
+    
+    for (let i=0; i<amount; i++) {
+        range.push(start + i);
+    }
+
+    return range;
+}
+
+function formatRangeOfSeedValues(seeds) {
+    const seedArray = [];
+
+    const firstRange = generateRange(seeds[0], seeds[1]);
+    const secondRange = generateRange(seeds[2], seeds[3]);
+
+    seedArray.push(...firstRange, ...secondRange);
+
+    return seedArray;
+}
+
 getSeedId();
 
 //console.log(seedArr);
