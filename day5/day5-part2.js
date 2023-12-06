@@ -1,74 +1,55 @@
 const fs = require('fs');
+const { config } = require('process');
 const f = fs.readFileSync('day5.txt', 'utf-8');
 
 function getSeedId() {
-    const input = f.split(/\r?\n\n/);
+    const input = f.split(/\r\n\r\n/);
     const seedRow = input[0];
     const seedsArr = seedRow.match(/seeds: (\d+(?: \d+)*)/);
     const seedValues = seedsArr[1].split(' ').map(Number);
-    
-    const seeds = [];
 
-    for(let i=0; i<seedValues.length; i++) {
-        let location = seedValues[i];
+    const humToLocArr = getLowestOrderLocsFromInput(input[7]);
 
-        for (let i=input.length-1; i>0; i--) {
-            location = checkCurrentMap(location, input[i]);
+    for(let i=0; i<humToLocArr.length; i++) {
+        for(let j=humToLocArr[i][0]; j<humToLocArr[i][0] + humToLocArr[i][2]; j++) {
+            let location = j;
+            for (let k=input.length-1; k>0; k--) {
+                location = reverseCheckCurrentMap(location, input[k]);
+            }
+
+            if (seedValues.includes(location)) {
+                return(location);
+            }
         }
-
-        seeds.push(location);
     }
-
-    // console.log(Math.min(...locations));
-    console.log(seeds);
 }
  
-function checkCurrentMap(seedId, map) {
-    let mapConfigs = map.split('\n').slice(1); 
-    let newSeedVal = seedId;
-    
-    for (let i=0; i<mapConfigs.length; i++) {
-        const mapEntry = mapConfigs[i].split(/\s+/).map(Number);
-        console.log(mapEntry)
-        if (seedId >= mapEntry[1] && seedId <= mapEntry[1] + mapEntry[2] && seedId == newSeedVal) {
-            newSeedVal = seedId - mapEntry[1] + mapEntry[0];
-        }
-    }
-    
-    console.log(newSeedVal)
-    return newSeedVal;
-}
-
-
-function getLocationFromSeed(seedId, input) {
-    let location = seedId;
-
-    for (let i = input.length - 1; i >= 0; i--) {
-        location = reverseCheckCurrentMap(location, input[i]);
-    }
-
-    return location;
-}
-
 function reverseCheckCurrentMap(location, map) {
-    let mapConfigs = map.split('\n').slice(1);
-    let originalSeedVal = location;
+    let lines = map.split('\n');
+    lines.shift();
+    let mapConfigs = lines.map(line => line.split(' ').map(Number));
+    let newLocation = location;
 
-    for (let i = 0; i < mapConfigs.length; i++) {
-        const mapEntry = mapConfigs[i].split(/\s+/).map(Number);
-
-        if (
-            location >= mapEntry[0] &&
-            location <= mapEntry[0] + mapEntry[2] &&
-            location == originalSeedVal
-        ) {
-            originalSeedVal = location + mapEntry[1] - mapEntry[0];
+    for (let i=0; i<mapConfigs.length; i++) {
+        if (location >= mapConfigs[i][0] && location <= mapConfigs[i][0] + mapConfigs[i][2] && location == newLocation) {
+            newLocation = location - mapConfigs[i][0] + mapConfigs[i][1];
         }
     }
 
-    return originalSeedVal;
+
+    return newLocation;
 }
 
-getSeedId();
+function getLowestOrderLocsFromInput(locationMap) {
+    let lines = locationMap.split('\n');
+    lines.shift();
+    let result = lines.map(line => line.split(' ').map(Number));
+    
+    result.sort((a, b) => a[0] - b[0]);
+
+    return result;
+}
+
+console.log("seed is: ", getSeedId());
 
 // seeds: 79 14 55 13
