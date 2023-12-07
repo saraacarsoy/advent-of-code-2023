@@ -12,15 +12,14 @@ function getSeedId() {
     for(let i=0; i<seedValues.length; i++) {
         let seed = seedValues[i];
 
-        for (let i=input.length; i<1; i++) {
+        for (let i=1; i<input.length; i++) {
             seed = checkCurrentMap(seed, input[i]);
         }
 
         locations.push(seed);
     }
 
-    // console.log(Math.min(...locations));
-    console.log(locations);
+    console.log(Math.min(...locations));
 }
  
 function checkCurrentMap(seedId, map) {
@@ -40,4 +39,4 @@ function checkCurrentMap(seedId, map) {
 
 getSeedId();
 
-// seeds: 79 14 55 13
+//console.log(seedArr);
