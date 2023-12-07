@@ -15,11 +15,29 @@ let highCardArr: HandBet[] = [];
 
 export function checkFiveOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
+    const jokers: number = getJokerAmount(matches);
+
+    if((jokers > 0 && Object.values(matches).some(value => value === 4) 
+    || jokers > 1 &&  Object.values(matches).some(value => value === 3)
+    || jokers > 2 &&  Object.values(matches).some(value => value === 2)
+    || jokers > 3 &&  Object.values(matches).some(value => value === 1)
+    || jokers > 4)) {
+        return true;    
+    }
+
     return Object.values(matches).some(value => value === 5);
 }
 
 export function checkFourOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
+    const jokers: number = getJokerAmount(matches);
+
+    if((jokers > 0 && Object.values(matches).some(value => value === 3))
+    || jokers > 1 &&  Object.values(matches).some(value => value === 2)
+    || jokers > 2 &&  Object.values(matches).some(value => value === 1)) {
+        return true;    
+    }
+
     return Object.values(matches).some(value => value === 4);
 }
 
@@ -27,6 +45,12 @@ export function checkThreeOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const threeCards = Object.values(matches).some(value => value === 3);
     const twoCards = Object.values(matches).some(value => value === 2);
+    const jokers: number = getJokerAmount(matches);
+
+    if(jokers > 0 && twoCards) {
+        return true;    
+    }
+
     return threeCards && !twoCards;
 }
 
@@ -34,12 +58,24 @@ export function checkFullHouse(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const threeCards = Object.values(matches).some(value => value === 3)
     const twoCards = Object.values(matches).some(value => value === 2)
+    const jokers: number = getJokerAmount(matches);
+
+    if(jokers > 0 && (Object.values(matches).filter(value => value === 2).length == 2)) {
+        return true;    
+    }
+
     return threeCards && twoCards;
 }
 
 export function checkTwoPair(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const pairs = Object.values(matches).filter(value => value === 2);
+    const jokers: number = getJokerAmount(matches);
+
+    if(jokers > 0 && pairs.length === 1) {
+        return true;    
+    }
+
     return pairs.length === 2;
 }
 
@@ -47,6 +83,12 @@ export function checkOnePair(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const pairs = Object.values(matches).filter(value => value === 2);
     const threeCards = Object.values(matches).some(value => value === 3);
+    const jokers: number = getJokerAmount(matches);
+
+    if(jokers > 0) {
+        return true;    
+    }
+
     return pairs.length === 1 && !threeCards;
 }
 
@@ -55,9 +97,14 @@ export function checkHighCard(cards: string): boolean {
     return Object.values(matches).every(value => value === 1);
 }
 
+export function getJokerAmount(cards: Record<string, number>): number {
+    return "N" in cards ? cards["N"] : 0;
+}
+
 export function getCardAmounts(cards: string) {
     const letters = cards.split("");
     const matches = {};
+
     letters.forEach(letter => {
         if(!matches[letter]){
             matches[letter] = 0;
@@ -76,7 +123,7 @@ export function parseInput(input: string): HandBet[] {
     lines.forEach(line => {
         const [hand, bet] = line.split(/\s+/, 2);
 
-        handBets.push({hand: convertHandToRankedLetters(hand), bet: parseInt(bet)});
+        handBets.push({hand: convertHandToRankedLetters(hand), bet: parseInt(bet), jokerAmount: 0});
     });
 
     return handBets;
@@ -114,7 +161,7 @@ export function convertHandToRankedLetters(hand: string): string {
         A: "A",
         K: "B",
         Q: "C",
-        J: "D",
+        //J: "D",
         T: "E",
         "9": "F",
         "8": "G",
@@ -124,6 +171,7 @@ export function convertHandToRankedLetters(hand: string): string {
         "4": "K",
         "3": "L",
         "2": "M",
+        J: "N"
     }
 
     return hand.split("").map(letter => rankedLetters[letter]).join("");
@@ -162,5 +210,4 @@ let sum = 0;
 list.forEach((handBet, index) => {
     sum += handBet.bet * (index + 1);
 });
-
 console.log(`Sum: ${sum}`);
