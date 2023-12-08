@@ -12,9 +12,38 @@ function readInput() {
     });
 
     // map.sort(sortNode);
+    // checkNodes(map, directions, 0);
+    
     map.sort(sortNodeFromEnd);
-    // checkNodes(map, directions);
-    checkEntryNodes(map, directions);
+    const targetArr = [];
+
+    for (let i=0; i<6; i++) {
+        targetArr.push(checkNodes(map, directions, i));
+    }
+
+    console.log(findCommonMultiplierOfArray(targetArr));
+}
+
+function findCommonDivisor(a, b) {
+    if (b === 0) {
+        return a;
+    } else {
+        return findCommonDivisor(b, a % b);
+    }
+}
+
+function findCommonMultiplier(a, b) {
+    return (a * b) / findCommonDivisor(a, b);
+}
+
+function findCommonMultiplierOfArray(arr) {
+    let result = arr[0];
+
+    for (let i = 1; i < arr.length; i++) {
+        result = findCommonMultiplier(result, arr[i]);
+    }
+
+    return result;
 }
 
 function sortNode(a, b) { //part 1
@@ -36,8 +65,20 @@ function sortNodeFromEnd(a, b) {
     }
 }
 
-function checkNodes(map, directionArr) {
-    let newNode = 0;
+function gcd(a, b) {
+    while (b !== 0) {
+        let temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+function lcm(a, b) {
+    return (a * b) / gcd(a, b);
+}
+
+function checkNodes(map, directionArr, newNode) {
     let count = 0;
     const mapLength = map.length;
 
@@ -45,36 +86,14 @@ function checkNodes(map, directionArr) {
         newNode = getTarget(map, newNode, directionArr[count % directionArr.length]);
         count += 1;
 
-        if (newNode === mapLength - 1 || count >= directionArr.length * mapLength) {
+        //if (newNode === mapLength - 1 || count >= directionArr.length * mapLength) {
+        if (newNode >= mapLength - 6 || count >= directionArr.length * mapLength) {
             break;
         }
     }
 
-    console.log(count);
-
-}
-
-function checkEntryNodes(map, directionArr) {
-    const startNodes = [0, 1];
-    let targetNodes = startNodes.slice();
-    let count = 0;
-
-    while (!targetNodes.every(node => node >= map.length - 2)) {
-        for (let i = 0; i < directionArr.length; i++) {
-            for (let j = 0; j < startNodes.length; j++) {
-                const newNode = getTarget(map, targetNodes[j], directionArr[i]);
-
-                targetNodes[j] = newNode;
-            }
-            console.log("counting: ", count);
-            count += 1;
-        }
-        
-    }
-    
     return count;
 }
-
 
 function getTarget(map, i, dir) {
     let target = dir === "L" ? map[i][1] : map[i][2];
