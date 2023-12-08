@@ -61,5 +61,3 @@ function checkIfSeedInRange(seedArr, seed) {
 }
 
 console.log("location is: ", getSeedId());
-
-// seeds: 79 14 55 13

@@ -38,5 +38,3 @@ function checkCurrentMap(seedId, map) {
 }
 
 getSeedId();
-
-//console.log(seedArr);

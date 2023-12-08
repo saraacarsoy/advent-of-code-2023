@@ -152,13 +152,6 @@ export function groupHandBets(handBets: HandBet[]) {
         else if(checkHighCard(handBet.hand)) {
             highCardArr.push(handBet);
         }
-        else {
-            console.log("!!! ERROR");
-        }
-
-        if (handBet.hand.includes('O')) {
-            console.log(handBet.hand, replaceJokerWithMostCommon(handBet.hand));
-        }
     })
 }
 
@@ -216,14 +209,5 @@ let sum = 0;
 list.forEach((handBet, index) => {
     sum += handBet.bet * (index + 1);
 });
-
-/*console.log("one pair: ", onePairArr);
-console.log("two pair: ", twoPairArr);
-console.log("three: ", threeOfAKindArr);
-console.log("four: ", fourOfAKindArr);
-console.log("five: ", fiveOfAKindArr);
-console.log("full h: ", fullHouseArr);
-console.log("h c: ", highCardArr);*/
-
 
 console.log(`Sum: ${sum}`);
