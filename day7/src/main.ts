@@ -15,81 +15,62 @@ let highCardArr: HandBet[] = [];
 
 export function checkFiveOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
-    const jokers: number = getJokerAmount(matches);
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
 
-    if((jokers > 0 && Object.values(matches).some(value => value === 4) 
-    || jokers > 1 &&  Object.values(matches).some(value => value === 3)
-    || jokers > 2 &&  Object.values(matches).some(value => value === 2)
-    || jokers > 3 &&  Object.values(matches).some(value => value === 1)
-    || jokers > 4)) {
-        return true;    
-    }
-
-    return Object.values(matches).some(value => value === 5);
+    return Object.values(matches).some(value => value === 5) || Object.values(updatedMatches).some(value => value === 5);
 }
 
 export function checkFourOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
-    const jokers: number = getJokerAmount(matches);
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
 
-    if((jokers > 0 && Object.values(matches).some(value => value === 3))
-    || jokers > 1 &&  Object.values(matches).some(value => value === 2)
-    || jokers > 2 &&  Object.values(matches).some(value => value === 1)) {
-        return true;    
-    }
-
-    return Object.values(matches).some(value => value === 4);
+    return Object.values(matches).some(value => value === 4) || Object.values(updatedMatches).some(value => value === 4);
 }
 
 export function checkThreeOfAKind(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const threeCards = Object.values(matches).some(value => value === 3);
     const twoCards = Object.values(matches).some(value => value === 2);
-    const jokers: number = getJokerAmount(matches);
 
-    if(jokers > 0 && twoCards) {
-        return true;    
-    }
-
-    return threeCards && !twoCards;
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
+    const updatedThreeCards = Object.values(updatedMatches).some(value => value === 3);
+    const updatedTwoCards = Object.values(updatedMatches).some(value => value === 2);
+    
+    return (threeCards && !twoCards) || (updatedThreeCards && !updatedTwoCards);
 }
 
 export function checkFullHouse(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const threeCards = Object.values(matches).some(value => value === 3)
     const twoCards = Object.values(matches).some(value => value === 2)
-    const jokers: number = getJokerAmount(matches);
 
-    if(jokers > 0 && (Object.values(matches).filter(value => value === 2).length == 2)) {
-        return true;    
-    }
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
+    const updatedThreeCards = Object.values(updatedMatches).some(value => value === 3);
+    const updatedTwoCards = Object.values(updatedMatches).some(value => value === 2);
 
-    return threeCards && twoCards;
+    return (threeCards && twoCards) || (updatedThreeCards && updatedTwoCards);
 }
 
 export function checkTwoPair(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const pairs = Object.values(matches).filter(value => value === 2);
-    const jokers: number = getJokerAmount(matches);
 
-    if(jokers > 0 && pairs.length === 1) {
-        return true;    
-    }
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
+    const uppdatedPairs = Object.values(updatedMatches).filter(value => value === 2);
 
-    return pairs.length === 2;
+    return pairs.length === 2 || uppdatedPairs.length === 2;
 }
 
 export function checkOnePair(cards: string): boolean {
     const matches = getCardAmounts(cards);
     const pairs = Object.values(matches).filter(value => value === 2);
     const threeCards = Object.values(matches).some(value => value === 3);
-    const jokers: number = getJokerAmount(matches);
 
-    if(jokers > 0) {
-        return true;    
-    }
+    const updatedMatches = replaceJokerWithMostCommon(cards); 
+    const uppdatedPairs = Object.values(updatedMatches).filter(value => value === 2);
+    const updatedThreeCards = Object.values(updatedMatches).some(value => value === 3);
 
-    return pairs.length === 1 && !threeCards;
+    return (pairs.length === 1 && !threeCards) || (uppdatedPairs.length === 1 && !updatedThreeCards);
 }
 
 export function checkHighCard(cards: string): boolean {
@@ -97,8 +78,27 @@ export function checkHighCard(cards: string): boolean {
     return Object.values(matches).every(value => value === 1);
 }
 
-export function getJokerAmount(cards: Record<string, number>): number {
-    return "N" in cards ? cards["N"] : 0;
+export function replaceJokerWithMostCommon(cards: string) {
+    const matches = getCardAmounts(cards);
+    const sortedKeys = Object.keys(matches).sort((a, b) => matches[b] - matches[a]);
+    const hasJoker = Object.keys(matches).some(key => key === "O");
+    let mostCommonLetter = "";
+
+    if (sortedKeys[0] === "O" && sortedKeys.length > 1) {
+        mostCommonLetter = sortedKeys[1];
+    }
+
+    else {
+        mostCommonLetter = sortedKeys[0]; 
+    }
+
+    if (hasJoker) {
+        matches[mostCommonLetter] += matches["O"];
+
+        delete matches["O"];
+    }
+
+    return matches;
 }
 
 export function getCardAmounts(cards: string) {
@@ -123,7 +123,7 @@ export function parseInput(input: string): HandBet[] {
     lines.forEach(line => {
         const [hand, bet] = line.split(/\s+/, 2);
 
-        handBets.push({hand: convertHandToRankedLetters(hand), bet: parseInt(bet), jokerAmount: 0});
+        handBets.push({hand: convertHandToRankedLetters(hand), bet: parseInt(bet)});
     });
 
     return handBets;
@@ -152,7 +152,13 @@ export function groupHandBets(handBets: HandBet[]) {
         else if(checkHighCard(handBet.hand)) {
             highCardArr.push(handBet);
         }
-        
+        else {
+            console.log("!!! ERROR");
+        }
+
+        if (handBet.hand.includes('O')) {
+            console.log(handBet.hand, replaceJokerWithMostCommon(handBet.hand));
+        }
     })
 }
 
@@ -167,11 +173,11 @@ export function convertHandToRankedLetters(hand: string): string {
         "8": "G",
         "7": "H",
         "6": "I",
-        "5": "J",
-        "4": "K",
-        "3": "L",
-        "2": "M",
-        J: "N"
+        "5": "K",
+        "4": "L",
+        "3": "M",
+        "2": "N",
+        J: "O"
     }
 
     return hand.split("").map(letter => rankedLetters[letter]).join("");
@@ -210,4 +216,14 @@ let sum = 0;
 list.forEach((handBet, index) => {
     sum += handBet.bet * (index + 1);
 });
+
+/*console.log("one pair: ", onePairArr);
+console.log("two pair: ", twoPairArr);
+console.log("three: ", threeOfAKindArr);
+console.log("four: ", fourOfAKindArr);
+console.log("five: ", fiveOfAKindArr);
+console.log("full h: ", fullHouseArr);
+console.log("h c: ", highCardArr);*/
+
+
 console.log(`Sum: ${sum}`);

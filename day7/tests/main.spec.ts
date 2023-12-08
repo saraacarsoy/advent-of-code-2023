@@ -100,10 +100,10 @@ describe("Hands", () => {
             const handBets = parseInput(input);
 
             expect(handBets.length).to.equal(2);
-            expect(handBets[0].hand).to.equal("LMELB");
+            expect(handBets[0].hand).to.equal("MNEMB");
             expect(handBets[0].bet).to.equal(765);
 
-            expect(handBets[1].hand).to.equal("EJJDJ");
+            expect(handBets[1].hand).to.equal("EKKOK");
             expect(handBets[1].bet).to.equal(684);
         });
     });
