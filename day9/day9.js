@@ -19,8 +19,9 @@ function readInput() {
             allZeroes = nextArr.every((num) => num === 0);
         }
         
-        const nextValues = getNextValue(allSequences);
-        sum += calculateNext(nextValues, rows[i]);
+        //const nextValues = getNextValue(allSequences);
+        const previousValuesOfSeq = getPreviousValues(allSequences);
+        sum += calculatePrevious(previousValuesOfSeq, rows[i]);
     }
 
     console.log(sum)
@@ -34,6 +35,14 @@ function getNextSequence(arr) {
     }
 
     return nextArr;
+}
+
+function getPreviousValues(allSequences) {
+    for (let i=allSequences.length-1; i >= 1; i--) {
+        allSequences[i-1].unshift(allSequences[i-1][0] - allSequences[i][0]);
+    }
+    
+    return allSequences;
 }
 
 function getNextValue(allSequences) {
@@ -53,5 +62,11 @@ function calculateNext(nextValues, currentArr) {
     const nextVal = nextValues[0][prevLast] + currentLast;
     return nextVal;
 }
+
+function calculatePrevious(previousValues, currentArr) {
+    const nextVal = currentArr[0] - previousValues[0][0];
+    return nextVal;
+}
+
 
 readInput();
