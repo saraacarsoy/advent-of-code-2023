@@ -1,10 +1,8 @@
 const fs = require('fs');
-const { config } = require('process');
 const f = fs.readFileSync('day5.txt', 'utf-8');
 
 function getSeedId() {
     const input = f.split(/\r?\n\n/);
-    // const input = f.split(/\r\n\r\n/);
     const seedRow = input[0];
     const seedsArr = seedRow.match(/seeds: (\d+(?: \d+)*)/);
     const seedValues = seedsArr[1].split(' ').map(Number);
