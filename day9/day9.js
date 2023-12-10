@@ -2,7 +2,7 @@ const fs = require('fs');
 const f = fs.readFileSync('day9.txt', 'utf-8');
 
 function readInput() {
-    const input = f.split('\n').filter(row => row.trim() !== ''); // Filtering out empty rows
+    const input = f.split('\n').filter(row => row.trim() !== '');
     const rows = input.map(row => row.split(/\s+/).filter(elem => elem !== '').map(Number));
 
     let sum = 0;
