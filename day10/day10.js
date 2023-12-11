@@ -61,6 +61,8 @@ function dfs(map, visitedSet, x, y, distance, directions) {
     if (right) {
         nextDistances.push(dfs(map, visitedSet, right[0], right[1], distance + 1, directions));
     }
+    console.log(nextDistances)
+
 
     return Math.max(...nextDistances);
 }
