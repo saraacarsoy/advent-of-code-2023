@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { default: test } = require('node:test');
 const f = fs.readFileSync('day12.txt', 'utf-8');
 
 function readInput() {
@@ -21,7 +20,7 @@ function createRegex(param) {
     
     let regexString = "^" + zeroOrMoreDotPattern + hashPattern.repeat(counts[0]);
   
-    for (let i=1; i<counts.length; i++) {
+    for (let i = 1; i < counts.length; i++) {
         regexString += atLeastOneDotPattern + hashPattern.repeat(counts[i]);
     }
 
@@ -30,8 +29,13 @@ function createRegex(param) {
     return new RegExp(regexString);
 }
 
+function getAllVariations(inputString, hashCount, memo = {}) {
+    const key = `${inputString}-${hashCount}`;
 
-function getAllVariations(inputString, hashCount) {
+    if (key in memo) {
+        return memo[key];
+    }
+
     const variations = [];
     const stack = [{ pattern: inputString.split(''), index: 0, hashCount: 0 }];
 
@@ -57,27 +61,44 @@ function getAllVariations(inputString, hashCount) {
         }
     }
 
+    memo[key] = variations;
     return variations;
 }
 
-
 function testVariations() {
     const springs = readInput();
-    count = 0;
+    let count = 0;
 
     springs.forEach(spring => {
+        spring = formatInputForPart2(spring);
+
         const totalHashes = spring[1].split(',').map(Number).reduce((acc, currentValue) => acc + currentValue, 0);
-        console.log(totalHashes)
         const possibleVariations = getAllVariations(spring[0], totalHashes);
         const regex = createRegex(spring[1]);
-
+        
         possibleVariations.forEach(variation => {
             if (regex.test(variation)) {
                 count++;
             }
         });  
-    });  
+    });
 
+    console.log(count);
+}
+
+//part 2
+function formatInputForPart2(spring) {
+    const pattern = increaseString(spring[0], true);
+    const hashes = increaseString(spring[1], false);
+
+    return [pattern, hashes];
+}
+
+function increaseString(str, qMark) {
+    const sign = qMark? '?' : ',';
+    const doubledString = str + sign + str + sign + str + sign + str + sign + str;
+
+    return doubledString;
 }
 
 testVariations();
