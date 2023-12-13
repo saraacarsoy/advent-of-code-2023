@@ -2,7 +2,7 @@ const fs = require('fs');
 const f = fs.readFileSync('day12.txt', 'utf-8');
 
 function readInput() {
-    let input = f.split('\r\n');
+    let input = f.split('\n');
 
     const map = input.map(entry => {
         return [springs, groups] = entry.split(" ");
@@ -29,10 +29,13 @@ function createRegex(param) {
     return new RegExp(regexString);
 }
 
-function getAllVariations(inputString, hashCount, memo = {}) {
-    const key = `${inputString}-${hashCount}`;
+let memo = {}
+
+function getAllVariations(inputString, pattern, hashCount) {
+    const key = pattern + hashCount;  // Include hash count in the key
 
     if (key in memo) {
+        console.log("fetching from cache");
         return memo[key];
     }
 
@@ -41,7 +44,6 @@ function getAllVariations(inputString, hashCount, memo = {}) {
 
     while (stack.length > 0) {
         const current = stack.pop();
-
         if (current.index === current.pattern.length && current.hashCount === hashCount) {
             variations.push(current.pattern.join(''));
         } else if (current.index < current.pattern.length) {
@@ -65,15 +67,16 @@ function getAllVariations(inputString, hashCount, memo = {}) {
     return variations;
 }
 
+
 function testVariations() {
     const springs = readInput();
     let count = 0;
 
     springs.forEach(spring => {
-        spring = formatInputForPart2(spring);
+        // spring = formatInputForPart2(spring);
 
         const totalHashes = spring[1].split(',').map(Number).reduce((acc, currentValue) => acc + currentValue, 0);
-        const possibleVariations = getAllVariations(spring[0], totalHashes);
+        const possibleVariations = getAllVariations(spring[0], spring[1], totalHashes);
         const regex = createRegex(spring[1]);
         
         possibleVariations.forEach(variation => {
