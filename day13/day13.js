@@ -18,8 +18,10 @@ function getMirrorRow(arr) {
         const top = arr.slice(i - span, i).reverse();
         const bottom = arr.slice(i, i + span);
 
-        if (arraysAreEqual(top, bottom)) {
-            return i;
+        if (!arraysAreEqual(top, bottom)) {
+            if (getDifferingCount(top, bottom) == 1) {
+                return i;
+            }
         }
     }
 
@@ -28,14 +30,16 @@ function getMirrorRow(arr) {
 
 function getMirrorCol(grid) {
     const cols = grid[0].length;
-
+    
     for (let i = 1; i < cols; i++) {
         const span = Math.min(i, cols - i);
         const left = grid.map(row => row.slice(i - span, i).reverse());
         const right = grid.map(row => row.slice(i, i + span));
 
-        if (arraysAreEqual(left, right)) {
-            return i;
+        if (!arraysAreEqual(left, right)) {
+            if (getDifferingCount(left, right) == 1) {
+                return i;
+            }
         }
     }
 
@@ -58,6 +62,20 @@ function arraysAreEqual(arr1, arr2) {
     }
 
     return true;
+}
+
+function getDifferingCount(arr1, arr2) {
+    let diffCount = 0;
+
+    for (let i = 0; i < arr1.length; i++) {
+        for (let j = 0; j < arr1[i].length; j++) {
+            if (arr1[i][j] !== arr2[i][j]) {
+                diffCount++;
+            }
+        }
+    }
+
+    return diffCount;
 }
 
 
