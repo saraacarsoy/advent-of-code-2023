@@ -1,62 +1,77 @@
 const fs = require('fs');
 const f = fs.readFileSync('day13.txt', 'utf-8');
+const arrays = readInput(); 
 
 function readInput() {
-    let input = f.split('\n');
+    const patterns = f.split(/\r?\n\r?\n/);
 
-    return input;
+    return patterns.map(pattern => {
+        return pattern.split(/\r?\n/).map(row => row.split(''));
+    });
 }
 
-function areSpecificColumnPairsEqual(matrix, pairs) {
-    const numRows = matrix.length;
-    const numCols = matrix[0].length;
+function getMirrorRow(arr) {
+    const rows = arr.length;
 
-    for (const [col1, col2] of pairs) {
-        if (col1 < 0 || col1 >= numCols || col2 < 0 || col2 >= numCols) { // out of range
-            return false;
+    for (let i = 1; i < rows; i++) {
+        const span = Math.min(i, rows - i);
+        const top = arr.slice(i - span, i).reverse();
+        const bottom = arr.slice(i, i + span);
+
+        if (arraysAreEqual(top, bottom)) {
+            return i;
         }
+    }
 
-        for (let row = 0; row < numRows; row++) {
-            if (matrix[row][col1] !== matrix[row][col2]) {
-                console.log("no match :", col1, col2);
+    return null;
+}
+
+function getMirrorCol(grid) {
+    const cols = grid[0].length;
+
+    for (let i = 1; i < cols; i++) {
+        const span = Math.min(i, cols - i);
+        const left = grid.map(row => row.slice(i - span, i).reverse());
+        const right = grid.map(row => row.slice(i, i + span));
+
+        if (arraysAreEqual(left, right)) {
+            return i;
+        }
+    }
+
+    return null;
+}
+
+function arraysAreEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+        if (Array.isArray(arr1[i]) && Array.isArray(arr2[i])) {
+            if (!arraysAreEqual(arr1[i], arr2[i])) {
                 return false;
             }
+        } else if (arr1[i] !== arr2[i]) {
+            return false;
         }
     }
 
     return true;
 }
 
-function areSpecificRowPairsEqual(matrix, pairs) {
-    const numRows = matrix.length;
-    const numCols = matrix[0].length;
 
-    for (const [row1, row2] of pairs) {
-        if (row1 < 0 || row1 >= numRows || row2 < 0 || row2 >= numRows) { // out of range
-            return false;
-        }
-
-        for (let col = 0; col < numCols; col++) {
-            if (matrix[row1][col] !== matrix[row2][col]) {
-                console.log("no match :", row1+1, row2+1);
-                return false;
-            }
-        }
+let count = 0;
+arrays.forEach((arr) => {
+    const row = getMirrorRow(arr);
+    
+    if (row !== null) {
+        count += row * 100;
+    } else {
+        const col = getMirrorCol(arr);
+        count += col !== null ? col : 0;
     }
+});
 
-    return true;
-}
+console.log(count);
 
-const matrix = [
-    [1, 2, 3, 4],
-    [1, 2, 3, 4],
-    [1, 2, 3, 4],
-];
-
-
-// cols i and i+1 should be equal at one point, where they are equal start checking for i-1 and i+1+1, then i-1-1 and i+1+1+1 ... 
-
-const pairsToCheck = [[0, 1], [2, 3]];
-
-areSpecificColumnPairsEqual(matrix, pairsToCheck);
-areSpecificRowPairsEqual(matrix, pairsToCheck);
