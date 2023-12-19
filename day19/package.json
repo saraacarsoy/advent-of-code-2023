@@ -1,0 +1,21 @@
+{
+  "name": "day-07",
+  "version": "1.0.0",
+  "type": "module",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
+    "build": "npm test && tsc"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/jest": "^29.5.11",
+    "@types/mocha": "^10.0.6",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1",
+    "undici-types": "^6.0.1"
+  }
+}
