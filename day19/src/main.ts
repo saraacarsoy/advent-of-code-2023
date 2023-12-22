@@ -62,11 +62,54 @@ export function parsePart(str: string): Part {
 }
 
 function run() {
-    const input = readInputFile("input.txt");
+    const input = readInputFile("./day19.txt");
     const workflows = readWorkFlows(input);
     const parts = readParts(input);
 
-    // math it out :^)    
+    let sum = 0;
+    const workflow = new Map<string, WorkFlow>(workflows.map(v => [v.name, v]));
+    parts.forEach(part => {
+        const a = findNextWorkflow(workflow.get("in"), part, workflow);
+        if (a == "A") {
+            sum += part.a + part.m + part.s + part.x;
+        }
+    });
+
+    const sum2 = parts
+    .filter(part => findNextWorkflow(workflow.get("in"), part, workflow) === "A")
+    .reduce((sum, part) => sum + part.a + part.m + part.s + part.x, 0);
+
+    console.log("sum1:", sum, "sum2:", sum2);
+}
+
+function findNextWorkflow(workflow: WorkFlow, part: Part, map: Map<string, WorkFlow>) {
+    for (const rule of workflow.rules) {
+        const work = map.get(rule.toWorkflow)
+
+        if (!rule.key) {
+            if (rule.toWorkflow == "A" || rule.toWorkflow == "R") {
+                return rule.toWorkflow;
+            }
+
+            return findNextWorkflow(work, part, map);
+        }
+
+        if (rule.comparator == "<" && part[rule.key] < rule.value) {
+            if (rule.toWorkflow == "A" || rule.toWorkflow == "R") {
+                return rule.toWorkflow;
+            }
+
+            return findNextWorkflow(work, part, map);
+        }
+        else if (rule.comparator == ">" && part[rule.key] > rule.value) {
+            if (rule.toWorkflow == "A" || rule.toWorkflow == "R") {
+                return rule.toWorkflow;
+            }
+
+            return findNextWorkflow(work, part, map);
+        }
+    }
+    console.log("error");
 }
 
 run();
